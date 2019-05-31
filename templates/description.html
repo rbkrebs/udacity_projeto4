@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block content %}
+		<section class="container">
+			<div class="jumbotron jumbotron-fluid">
+				<div class="container">
+					<h3 class="display-4">{{ item.title }}</h3>
+					<hr class="my-4">
+					<p>Description: {{ item.description }}</p>
+
+					{%if login%}
+					<a class="btn btn-warning" href="/templates/edititem/{{category}}/{{item.title}}">Edit</a>
+					<a class="btn btn-danger" href="/templates/deleteitem/{{category}}/{{item.title}}">Delete</a>
+					<a  class="btn btn-info" href="/templates/catalog">Cancel</a>
+					{%endif%}
+
+				</div>
+
+			</div>
+		</section>
+{% endblock %}

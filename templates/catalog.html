@@ -1,0 +1,24 @@
+{% extends "base.html" %}
+
+{% block content %}
+		<section class="container">
+			<div class="jumbotron jumbotron-fluid row">
+				<div class="container col-4">
+					<h2>Categories</h2>
+					<ul class="list-group list-group-flush">
+					{% for i in categories %}
+						<li class="list-group-item" ><a href="/templates/catalog/{{ i.title }}/categoryitems/">{{ i.title }}</a></li>
+					{% endfor %}
+					</ul>
+				</div>
+				<div class="container col-6">
+					<h2>Latest Items</h2>
+					<ul class="list-group list-group-flush">
+					{% for item in items %}
+						<li class="list-group-item">{{ item[0].title }}({{ item[1].title }})</li>
+					{% endfor %}
+					</ul>
+				</div>
+			</div>
+		</section>
+{% endblock %}

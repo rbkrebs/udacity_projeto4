@@ -1,0 +1,77 @@
+header {
+
+	height: 100px;
+	display: flex;
+	color: white;
+}
+#header{
+
+	background-color: #2b2c2d;
+	position: fixed;
+	overflow: hidden;
+	top: 0;
+	width: 100%;
+	z-index: 999;
+	box-shadow: 0 4px 3px 1px rgba(10,10,10,0.5);
+	transition: top 1.5s;
+}
+
+.navbar-catalog{
+	background-color: #333538;
+	position: relative
+
+
+}
+
+.navbar-catalog a{
+
+	font-size: 20px;
+}
+
+.navbar-nav{
+
+	padding: 0 !important;
+	margin: 0 !important;
+}
+
+section{
+
+	margin-top: 200px;
+}
+
+nav a{
+
+	border-radius: 5px
+}
+
+nav ul{
+
+	padding: 5px 0;
+}
+nav a:hover{
+
+	color: white;
+
+}
+
+nav li{
+
+	margin-left: 5px;
+}
+
+h1 a{
+
+	text-decoration: none;
+
+}
+
+h1 a:hover{
+
+	text-decoration: none;
+}
+
+section li:hover{
+
+	background-color: #568745;
+	color: white;
+}

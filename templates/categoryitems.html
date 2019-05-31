@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+
+{% block content %}
+		<section class="container">
+				<div class="jumbotron jumbotron-fluid row">
+					<div class="container col-4">
+						<h2>Categories</h2>
+						<ul class="list-group list-group-flush">
+							{% for i in categories %}
+							<li class="list-group-item" ><a href="/templates/catalog/{{ i.title }}/categoryitems/">{{ i.title }}</a>
+							{% endfor %}
+						</ul>
+					</div>
+					<div class="container col-6">
+						{% if size>1  %}
+						<h2>{{ title }} Items ({{ size }} items)</h2>
+						{% else  %}
+						<h2>{{ title }} Items ({{ size }} item)</h2>
+						{% endif %}
+						<ul class="list-group list-group-flush">
+							{% for item in items %}
+							<li class="list-group-item"><a href="/templates/catalog/{{ title }}/{{ item.title }}/">{{ item.title}}</li>
+							{% endfor %}
+						</ul>
+					</div>
+				</div>
+		</section>
+{% endblock %}

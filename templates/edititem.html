@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+		<section class="container">
+			<div class="jumbotron jumbotron-fluid">
+				<div class="container">
+					<h3 class="display-4">{{ item.title }}</h3>
+					<form method="POST">
+						<div class="form-group">
+							<label for="exampleInputEmail1">Category title</label>
+							<input type="text" name="title" class="form-control" placeholder="{{ item.title }}">
+							<label for="exampleInputEmail1">Description</label>
+							<textarea type="text" name="description" class="form-control" placeholder= "{{ item.description }}"></textarea>
+							<label class="col" for="exampleInputEmail1">Select the category</label>
+							<select class="custom-select col-3" name="category">
+							{% for i in categories %}
+								<option value="{{i.id}}">{{ i.title }}</option>
+							{% endfor %}
+							</select>
+						</div>
+						<button type="submit" class="btn btn-success" value="add">Submit</button>
+						<button type="submit" class="btn btn-info" value="cancel">Cancel</button>
+					</form>
+				</div>
+			</div>
+		</section>
+
+
+{% endblock %}

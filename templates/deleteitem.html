@@ -1,0 +1,31 @@
+{% extends "base.html" %}
+
+{% block content %}
+		<section class="container">
+				<div class="jumbotron jumbotron-fluid row">
+					<div class="container">
+
+						<h5 class=" alert alert-danger" role="alert">Are you sure youwant to delete <mark><strong><i>{{ item.title }}</i></strong></mark> item??</h5>
+						<form method="POST">
+
+						<button type="submit" class="btn btn-success" value="delete">Yes</button>
+						<button type="submit" class="btn btn-info" value="cancel">No</button>
+						</form>
+					</div>
+					</div>
+		</section>
+{% endblock %}
+<!--
+colocar isso
+
+<div class= "input-field col s6">
+	<label> Are you you sure you want to delete {{item.name}} item?</label>
+</div>
+<div class= "input-field col s6">
+	<input type="submit" name="delete" class="waves-effect waves-light btn red" value="delete"/>
+</div>
+
+
+
+
+-->

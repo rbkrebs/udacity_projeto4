@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>Catalog</title>
+
+		<meta charset="utf-8">
+    	<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css" integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    	<link rel="stylesheet" type="text/css" href="{{ url_for('static', filename = 'styles.css') }}">
+		<script src="https://code.jquery.com/jquery-3.2.1.slim.min.js" integrity="sha384-KJ3o2DKtIkvYIK3UENzmM7KCkRr/rE9/Qpg6aAZGJwFDMVNA/GpGFF93hXpG5KkN" crossorigin="anonymous"></script>
+    	<script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/1.12.9/umd/popper.min.js" integrity="sha384-ApNbgh9B+Y1QKtv3Rn7W3mgPxhU9K/ScQsAP7hUibX39j7fakFPskvXusvfa0b4Q" crossorigin="anonymous"></script>
+    	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0/js/bootstrap.min.js" integrity="sha384-JZR6Spejh4U02d8jOt6vLEHfe/JQGiRRSQQxSfFWpi1MquVdAyjUar5+76PVCmYl" crossorigin="anonymous"></script>
+
+		 <!--LOAD PRE-REQUISITES FOR GOOGLE SIGN IN -->
+		<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+		<script src="https://apis.google.com/js/client:platform.js?onload=start" async defer></script>
+	    <script> function start() {
+		    gapi.load('auth2', function() {
+		      auth2 = gapi.auth2.init({
+		        client_id: '106349497718-4k80fnodc3l64re4248ka79i4qji81dl.apps.googleusercontent.com'
+		      });
+		    });
+		  }
+		</script>
+</head>
+
+<body>
+<div id="header">
+	<header class="container">
+		<div class="row h-100">
+			<div class="container my-auto">
+				<div class="container">
+				<h1><a href="/templates/catalog/">Catalog app</a></h1>
+				</div>
+			</div>
+		</div>
+	</header>
+	<nav class="navbar navbar-expand-lg navbar-light bg-dark ">
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent" aria-controls="navbarSupportedContent">
+	        <span class="navbar-toggler-icon"></span>
+	    </button>
+		<div class="collapse navbar-collapse" id="navbarSupportedContent">
+			{% if login %}
+		    <ul class="navbar-nav mr-auto">
+		        <li class="nav-item">
+			        <a class="nav-link text-white" href="/templates/newcategory/">Add new category</a>
+		        </li>
+		        <li class="nav-item">
+			        <a  class="nav-link text-white" href="/templates/newitems/">Add new item</a>
+		        </li>
+		    </ul>
+		    <div class="col">
+		    	<a id="logout" class="float-right nav-link btn btn-danger" href="#">Logout</a>
+		    </div>
+
+		    {% else %}
+
+		    <div class="col">
+		    	<a class="float-right nav-link btn btn-success" href="/templates/login">Login</a>
+		    </div>
+
+		    {% endif %}
+
+		</div>
+	</nav>
+</div>
+
+{% block content %}{% endblock %}
+
+<footer>
+
+	<script type="text/javascript">
+		var btns = btnContainer.getElementsByClassName("nav-item");
+		for (var i = 0; i < btns.length; i++) {
+			  btns[i].addEventListener("click", function() {
+			    var current = document.getElementsByClassName("active");
+			    current[0].className = current[0].className.replace(" active", "");
+			    this.className += " active";
+			  });
+		}
+	</script>
+	<!--Function responsable to send data to server for authentication -->
+	<script>
+	  $('#signinButton').click(function() {
+	    function signInCallback(authResult){
+	      if (authResult['code']){
+	        $('#signinButton').attr('style', 'display: none');
+	        $.ajax({
+	          type: 'POST',
+	          url: '/gconnect?state={{STATE}}',
+	          headers: {
+	          'X-Requested-With': 'XMLHttpRequest'
+	          },
+	          contentType: 'application/octet-stream; charset=utf-8',
+	          success:function(result){
+	            $('#result').html('Login Successful!</br>'+ result + '</br>Redirecting...')
+	                 setTimeout(function() {
+	                  window.location.href = "/";
+	                 }, 2000);
+	          },
+	          processData:false,
+	          data:authResult['code']
+	        });
+	      } else{
+	        // handle error
+	        console.log('There was an error: ' + authResult['error']);
+	        $('#result').html('Failed to make a server-side call. Check your configuration and console.');
+	      }
+	    }
+	    auth2.grantOfflineAccess().then(signInCallback);
+	  });
+	</script>
+	<!--This is responsable to logout the user -->
+	<script>
+	  $('#logout').click(function() {
+	    function signOut(){
+
+	        $.ajax({
+	         url: '/gdisconnect',
+	         contentType: 'application/octet-stream; charset=utf-8',
+	          success:function(result){
+	            $('#result').html('Logout Successful!</br></br>Redirecting to home page...')
+	                 setTimeout(function() {
+	                  window.location.href = "/";
+	                 }, 2000);
+	          },
+	        });
+
+	    }
+	    var auth2 = gapi.auth2.getAuthInstance();
+	    auth2.signOut().then(signOut);
+    });
+
+	</script>
+
+
+
+
+
+
+</footer>
