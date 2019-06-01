@@ -28,6 +28,8 @@ class Category(Base):
 
     title = Column(String(80), nullable=False)
     id = Column(Integer, primary_key=True)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(UserLogged)
 
     # To send JSON objects in a serializable format
     @property
@@ -49,8 +51,9 @@ class CategoryItem(Base):
     id = Column(Integer, primary_key=True)
     description = Column(String(250))
     category_id = Column(Integer, ForeignKey('category.id'))
-    category = relationship(Category, backref=backref(
-        "CategoryItem", cascade="all,delete"))
+    category = relationship(Category)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(UserLogged)
 
     # To send JSON objects in a serializable format
     @property
