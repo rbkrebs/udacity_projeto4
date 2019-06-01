@@ -9,11 +9,11 @@
 				<form action="" method="POST">
 					<div class="form-group">
 					    <label for="exampleInputEmail1">Category title</label>
-					    <input type="text" name="title" class="form-control" placeholder="Category title">
+					    <input type="text" name="title" class="form-control" placeholder="Category title" required>
 					    <label for="exampleInputEmail1">Description</label>
-					    <textarea type="text" name="description" class="form-control" placeholder="Write here some information about the item"></textarea>
+					    <textarea type="text" name="description" class="form-control" placeholder="Write here some information about the item" required></textarea>
 					    <label class="col" for="exampleInputEmail1">Select the category</label>
-					    <select class="custom-select col-3" name="category">
+					    <select class="custom-select col-3" name="category" required>
 							{% for i in categories %}
 							<option value="{{i.id}}">{{ i.title }}</option>
 							{% endfor %}
