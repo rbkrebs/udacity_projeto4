@@ -10,7 +10,7 @@ According to `Udacity` "*The Item Catalog project consists of developing an appl
 
 Yuo must have installed on your computer:
 
-* [Vagrant](https://www.vagrantup.com/downloads.html);
+* [Vagrant](https://github.com/udacity/fullstack-nanodegree-vm); (*You can clone ou download this project*)
 * [VirtualBox](https://www.virtualbox.org/wiki/Downloads);
 * [Python 2.7](https://www.python.org/downloads/);
 * [Google Account](https://myaccount.google.com/);
