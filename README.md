@@ -35,12 +35,22 @@ python app.py
 ```
 http://localhost:5000
 ```
-## JSON Endpoint
+## JSON Endpoints
 
 This endpoint will return all the categories and its items recorded on database.
 
 ```
 http://localhost:/templates/catalog/JSON
+```
+This endpoint will return all items from a specific category recorded on database.
+
+```
+http://localhost:/templates/catalogitems/integer/JSON
+```
+where *integer* is the number of the category, for exemple
+
+```
+http://localhost:/templates/catalogitems/1/JSON
 ```
 
 ## License
