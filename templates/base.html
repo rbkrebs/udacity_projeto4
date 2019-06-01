@@ -69,16 +69,7 @@
 
 <footer>
 
-	<script type="text/javascript">
-		var btns = btnContainer.getElementsByClassName("nav-item");
-		for (var i = 0; i < btns.length; i++) {
-			  btns[i].addEventListener("click", function() {
-			    var current = document.getElementsByClassName("active");
-			    current[0].className = current[0].className.replace(" active", "");
-			    this.className += " active";
-			  });
-		}
-	</script>
+
 	<!--Function responsable to send data to server for authentication -->
 	<script>
 	  $('#signinButton').click(function() {

@@ -9,11 +9,13 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+
 class UserLogged(Base):
     """
     Registered user information is stored in db
     to easily manage permissions
     """
+
     __tablename__ = 'userlogged'
 
     id = Column(Integer, primary_key=True)
@@ -28,8 +30,8 @@ class Category(Base):
 
     title = Column(String(80), nullable=False)
     id = Column(Integer, primary_key=True)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship(UserLogged)
+    user_id = Column(Integer, ForeignKey('userlogged.id'))
+    userlogged = relationship(UserLogged)
 
     # To send JSON objects in a serializable format
     @property
@@ -52,8 +54,8 @@ class CategoryItem(Base):
     description = Column(String(250))
     category_id = Column(Integer, ForeignKey('category.id'))
     category = relationship(Category)
-    user_id = Column(Integer, ForeignKey('user.id'))
-    user = relationship(UserLogged)
+    user_id = Column(Integer, ForeignKey('userlogged.id'))
+    userlogged = relationship(UserLogged)
 
     # To send JSON objects in a serializable format
     @property

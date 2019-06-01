@@ -16,7 +16,7 @@ import requests
 from sqlalchemy import create_engine
 from sqlalchemy.orm import sessionmaker
 from sqlalchemy import func, distinct
-from database_setup import Base, Category, CategoryItem
+from database_setup import Base, Category, CategoryItem, UserLogged
 
 app = Flask(__name__)
 app.secret_key = "super secret key"
@@ -38,9 +38,7 @@ APPLICATION_NAME = "CatalogApp"
 @app.route('/templates/catalog/')
 def showCatalog():
     '''Return the page with all Categories and the last items included'''
-    login = False
-    if 'username' in login_session:
-        login = True
+    login = login_session.get('connected')
     categories = session.query(Category.title).all()
     items = session.query(
         CategoryItem, Category).join(
@@ -55,9 +53,7 @@ def showCatalog():
 @app.route('/templates/catalog/<string:title>/categoryitems/')
 def showCategory(title):
     '''Return the page with all Items related to selected category'''
-    login = False
-    if 'username' in login_session:
-        login = True
+    login = login_session.get('connected')
     categories = session.query(Category).all()
     category_id = session.query(Category.id).filter_by(title=title)
     items = session.query(CategoryItem.title).filter_by(
@@ -72,9 +68,7 @@ def showCategory(title):
 @app.route('/templates/catalog/<string:category>/<string:item>/')
 def showDescription(category, item):
     '''Return the page with the descripion of the selected item'''
-    login = False
-    if 'username' in login_session:
-        login = True
+    login = login_session.get('connected')
     item = session.query(CategoryItem).filter_by(title=item).first()
 
     return render_template(
@@ -88,8 +82,11 @@ def addCategory():
     It just can be done if the user is logged in'''
     if 'username' not in login_session:
         return redirect('/templates/login')
+
     if request.method == 'POST':
-        newCategory = Category(title=request.form['title'])
+        newCategory = Category(
+           title=request.form['title'],
+           user_id=login_session['user_id'])
         session.add(newCategory)
         session.commit()
         return redirect(url_for('showCatalog'))
@@ -111,7 +108,8 @@ def addItem():
         newItem = CategoryItem(
             title=request.form['title'],
             description=request.form['description'],
-            category_id=request.form['category'])
+            category_id=request.form['category'],
+            user_id=login_session['user_id'])
         session.add(newItem)
         session.commit()
         return redirect(url_for('showCatalog'))
@@ -127,13 +125,20 @@ def addItem():
 def editItem(category, item):
     '''Return the page where the user can edit items.
     It just can be done if the user is logged in'''
-    if 'username' not in login_session:
-        return redirect('/templates/login')
+
+    login = login_session.get('connected')
+
     categories = session.query(Category).all()
     upItem = session.query(CategoryItem).filter_by(title=item).first()
 
-    if request.method == 'POST':
+    if upItem.user_id != login_session.get('user_id'):
+        return "<script>alert('Sorry, you are not allowed to edit this item');\
+        setTimeout(function() {\
+                      window.location.href = '/';\
+                     }, 0);</script>"
 
+    if request.method == 'POST':
+        # Checking if fields are empty
         if (request.form['title']):
 
             upItem.title = request.form['title']
@@ -162,10 +167,15 @@ def editItem(category, item):
 def deleteItem(category, item):
     '''Return the page where the user can delete items.
     It just can be done if the user is logged in'''
-    if 'username' not in login_session:
-        return redirect('/templates/login')
+    login = login_session.get('connected')
 
     delItem = session.query(CategoryItem).filter_by(title=item).first()
+
+    if delItem.user_id != login_session.get('user_id'):
+        return "<script>alert('Sorry, you are not allowed to edit this item');\
+        setTimeout(function() {\
+                      window.location.href = '/';\
+                     }, 0);</script>"
 
     if request.method == 'POST':
 
@@ -173,9 +183,9 @@ def deleteItem(category, item):
         session.commit()
         return redirect(url_for('showCatalog'))
     else:
-        return render_template('deleteitem.html', item=delItem, login=True)
+        return render_template('deleteitem.html', item=delItem, login=login)
 
-
+# JSON API to view all categories and theirs items
 @app.route('/templates/catalog/JSON')
 def catalogJSON():
     categories = session.query(Category).all()
@@ -188,15 +198,23 @@ def catalogJSON():
                 c['Items'].append(i)
     return jsonify(categories)
 
+# JSON API to view just items of a especific category
+@app.route('/templates/catalogitems/<int:category_id>/JSON')
+def catalogItemsJSON(category_id):
+
+    items = session.query(CategoryItem).filter_by(
+        category_id=category_id).all()
+    items = [i.serialize for i in items]
+
+    return jsonify(items)
+
 
 # Create anti-forgery state token
 @app.route('/templates/login/')
 def showLogin():
     '''This function return the login template where the
     user can access the website using your google account'''
-    login = False
-    if 'username' in login_session:
-        login = True
+    login = login_session.get('connected')
     state = ''.join(random.choice(string.ascii_uppercase + string.digits)
                     for x in xrange(32))
     login_session['state'] = state
@@ -215,7 +233,7 @@ def gconnect():
         response.headers['Content-Type'] = 'application/json'
         return response
     code = request.data
-
+    login_session['connected'] = False
     try:
         oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
         oauth_flow.redirect_uri = 'postmessage'
@@ -267,13 +285,18 @@ def gconnect():
 
     data = answer.json()
     login_session['username'] = data.get('name', '')
-    login_session['picture'] = data.get('picture', '')
     login_session['email'] = data.get('email', '')
 
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
+    login_session['connected'] = True
+
     output = ''
-    output += '<h1>Welcome, '
+    output += '<h2>Welcome, '
     output += login_session['username']
-    output += '!</h1>'
+    output += '!</h2>'
 
     return output
 
@@ -299,7 +322,7 @@ def gdisconnect():
         del login_session['gplus_id']
         del login_session['username']
         del login_session['email']
-        del login_session['picture']
+        login_session['connected'] = False
         response = make_response(json.dumps('Successfully disconnected.'), 200)
         response.headers['Content-Type'] = 'application/json'
         return response
@@ -308,6 +331,34 @@ def gdisconnect():
             'Failed to revoke token for given user.', 400))
         response.headers['Content-Type'] = 'application/json'
         return response
+
+
+def createUser(login_session):
+    """This def must control the permissions to update or delete
+specific items"""
+
+    newUser = UserLogged(name=login_session['username'], email=login_session[
+                   'email'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(UserLogged).filter_by(
+       email=login_session['email']).one()
+    return user.id
+
+
+def getUserInfo(user_id):
+
+    user = session.query(UserLogged).filter_by(id=user_id).one_or_none()
+    return user
+
+
+def getUserID(email):
+
+    try:
+        user = session.query(UserLogged).filter_by(email=email).one()
+        return user.id
+    except Exception:
+        return None
 
 
 if __name__ == '__main__':
