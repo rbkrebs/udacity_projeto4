@@ -9,9 +9,20 @@ from sqlalchemy import create_engine
 
 Base = declarative_base()
 
+class UserLogged(Base):
+    """
+    Registered user information is stored in db
+    to easily manage permissions
+    """
+    __tablename__ = 'userlogged'
+
+    id = Column(Integer, primary_key=True)
+    name = Column(String(250), nullable=False)
+    email = Column(String(250), nullable=False)
+
 
 class Category(Base):
-    """docstring for Restaurant"""
+    """docstring for Category"""
 
     __tablename__ = 'category'
 
@@ -30,7 +41,7 @@ class Category(Base):
 
 
 class CategoryItem(Base):
-    """docstring for MenuItem"""
+    """docstring for CategoryItem"""
 
     __tablename__ = 'category_item'
 
